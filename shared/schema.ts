@@ -324,9 +324,9 @@ export const signupDoctorSchema = z.object({
 export type SignupPatientInput = z.infer<typeof signupPatientSchema>;
 export type SignupDoctorInput = z.infer<typeof signupDoctorSchema>;
 
-// Diagnosis schema
+// Diagnosis schema - Only Liver and Lung cancer for Pakistani Oncology focus
 export const diagnosisSchema = z.object({
-  cancerType: z.enum(["liver", "lung", "breast"]),
+  cancerType: z.enum(["liver", "lung"]),
   tumorSize: z.number().positive(),
   biomarker1: z.number(),
   biomarker2: z.string().optional().nullable(),

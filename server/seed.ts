@@ -16,16 +16,16 @@ const pakistaniHospitals = [
 ];
 
 const doctorsData = [
-  { name: "Dr. Ali Raza", email: "ali.raza@skmch.org", specialization: "Liver Specialist", hospitalIndex: 0 },
-  { name: "Dr. Ayesha Khan", email: "ayesha.khan@akuh.org", specialization: "Lung Specialist", hospitalIndex: 1 },
-  { name: "Dr. Bilal Ahmed", email: "bilal.ahmed@shifa.com", specialization: "Oncologist", hospitalIndex: 2 },
-  { name: "Dr. Zainab Malik", email: "zainab.malik@pims.gov.pk", specialization: "Oncologist", hospitalIndex: 3 },
-  { name: "Dr. Usman Tariq", email: "usman.tariq@jpmc.edu.pk", specialization: "Oncologist", hospitalIndex: 4 },
-  { name: "Dr. Fatima Yusuf", email: "fatima.yusuf@cmh.com", specialization: "Oncologist", hospitalIndex: 5 },
-  { name: "Dr. Hamza Farooq", email: "hamza.farooq@lnh.org.pk", specialization: "Oncologist", hospitalIndex: 6 },
-  { name: "Dr. Sana Mir", email: "sana.mir@services.gov.pk", specialization: "Oncologist", hospitalIndex: 7 },
-  { name: "Dr. Taimoor Hassan", email: "taimoor.hassan@lrh.gov.pk", specialization: "Oncologist", hospitalIndex: 8 },
-  { name: "Dr. Hira Javed", email: "hira.javed@indushospital.org.pk", specialization: "Oncologist", hospitalIndex: 9 },
+  { name: "Dr. Ali Raza", email: "aliraza@gmail.com", password: "aliraza786", specialization: "Liver Specialist", hospitalIndex: 0 },
+  { name: "Dr. Ayesha Khan", email: "ayeshakhan@gmail.com", password: "ayeshakhan786", specialization: "Lung Specialist", hospitalIndex: 1 },
+  { name: "Dr. Bilal Ahmed", email: "bilalahmed@gmail.com", password: "bilalahmed786", specialization: "Oncologist", hospitalIndex: 2 },
+  { name: "Dr. Zainab Malik", email: "zainabmalik@gmail.com", password: "zainabmalik786", specialization: "Oncologist", hospitalIndex: 3 },
+  { name: "Dr. Usman Tariq", email: "usmantariq@gmail.com", password: "usmantariq786", specialization: "Oncologist", hospitalIndex: 4 },
+  { name: "Dr. Fatima Yusuf", email: "fatimayusuf@gmail.com", password: "fatimayusuf786", specialization: "Oncologist", hospitalIndex: 5 },
+  { name: "Dr. Hamza Farooq", email: "hamzafarooq@gmail.com", password: "hamzafarooq786", specialization: "Oncologist", hospitalIndex: 6 },
+  { name: "Dr. Sana Mir", email: "sanamir@gmail.com", password: "sanamir786", specialization: "Oncologist", hospitalIndex: 7 },
+  { name: "Dr. Taimoor Hassan", email: "taimoorhassan@gmail.com", password: "taimoorhassan786", specialization: "Oncologist", hospitalIndex: 8 },
+  { name: "Dr. Hira Javed", email: "hirajaved@gmail.com", password: "hirajaved786", specialization: "Oncologist", hospitalIndex: 9 },
 ];
 
 const samplePatient = {
@@ -48,8 +48,6 @@ export async function seedDatabase() {
       return;
     }
 
-    const hashedPassword = await bcrypt.hash("password123", 10);
-
     console.log("Creating hospitals...");
     const createdHospitals = await db.insert(hospitals).values(pakistaniHospitals).returning();
     console.log(`Created ${createdHospitals.length} hospitals`);
@@ -66,10 +64,11 @@ export async function seedDatabase() {
     console.log("Creating doctors...");
     const createdDepartments = await db.select().from(departments);
     for (const doctorData of doctorsData) {
+      const hashedDoctorPassword = await bcrypt.hash(doctorData.password, 10);
       const [user] = await db.insert(users).values({
         name: doctorData.name,
         email: doctorData.email,
-        password: hashedPassword,
+        password: hashedDoctorPassword,
         role: "doctor",
         phone: "+92-300-0000000",
       }).returning();
@@ -90,10 +89,11 @@ export async function seedDatabase() {
     console.log(`Created ${doctorsData.length} doctors`);
 
     console.log("Creating sample patient...");
+    const patientPassword = await bcrypt.hash("ahmed786", 10);
     const [patientUser] = await db.insert(users).values({
       name: samplePatient.name,
       email: samplePatient.email,
-      password: hashedPassword,
+      password: patientPassword,
       role: "patient",
       phone: samplePatient.phone,
     }).returning();
@@ -109,8 +109,8 @@ export async function seedDatabase() {
 
     console.log("Database seeding completed successfully!");
     console.log("\nTest Credentials:");
-    console.log("Patient: ahmed.muhammad@example.com / password123");
-    console.log("Doctor: ali.raza@skmch.org / password123");
+    console.log("Patient: ahmed.muhammad@example.com / ahmed786");
+    console.log("Doctor: aliraza@gmail.com / aliraza786");
   } catch (error) {
     console.error("Seeding error:", error);
     throw error;

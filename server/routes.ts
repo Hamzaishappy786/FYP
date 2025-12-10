@@ -544,6 +544,38 @@ export async function registerRoutes(server: Server, app: Express): Promise<void
     }
   });
 
+  // Get doctor's profile
+  app.get("/api/doctor/profile", requireRole("doctor"), async (req: Request, res: Response) => {
+    try {
+      const user = await storage.getUserById(req.session.userId!);
+      if (!user || user.role !== "doctor") {
+        return res.status(403).json({ success: false, message: "Not a doctor" });
+      }
+
+      const doctor = await storage.getDoctorByUserId(user.id);
+      if (!doctor) {
+        return res.status(404).json({ success: false, message: "Doctor not found" });
+      }
+
+      const hospital = doctor.hospitalId ? await storage.getHospitalById(doctor.hospitalId) : null;
+
+      return res.json({
+        id: doctor.id,
+        name: user.name,
+        email: user.email,
+        phone: user.phone,
+        specialization: doctor.specialization,
+        experience: doctor.experience,
+        qualifications: doctor.qualifications,
+        hospitalName: hospital?.name || "Not assigned",
+        hospitalCity: hospital?.city || "",
+      });
+    } catch (error) {
+      console.error("Get doctor profile error:", error);
+      return res.status(500).json({ success: false, message: "Server error" });
+    }
+  });
+
   // Get doctor's patients
   app.get("/api/doctor/patients", requireRole("doctor"), async (req: Request, res: Response) => {
     try {
@@ -680,20 +712,6 @@ export async function registerRoutes(server: Server, app: Express): Promise<void
             probability = (35 + Math.min(data.tumorSize * 3, 20)) * smokingMultiplier;
           } else {
             probability = (10 + Math.min(data.tumorSize * 2, 15)) * smokingMultiplier;
-          }
-          break;
-          
-        case "breast":
-          // CA 15-3 based calculation with HER2 status
-          let her2Multiplier = 1;
-          if (data.biomarker2 === "positive") her2Multiplier = 1.4;
-          
-          if (data.biomarker1 > 100) {
-            probability = (70 + Math.min(data.tumorSize * 3, 20)) * her2Multiplier;
-          } else if (data.biomarker1 > 30) {
-            probability = (40 + Math.min(data.tumorSize * 2, 25)) * her2Multiplier;
-          } else {
-            probability = (12 + Math.min(data.tumorSize, 15)) * her2Multiplier;
           }
           break;
       }

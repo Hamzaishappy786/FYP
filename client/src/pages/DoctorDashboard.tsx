@@ -10,7 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/lib/auth";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { Users, Stethoscope, Brain, Loader2, Check, X, Clock, Download } from "lucide-react";
+import { Users, Stethoscope, Brain, Loader2, Check, X, Clock, Download, User, Building2, GraduationCap } from "lucide-react";
 
 interface PatientRequest {
   id: number;
@@ -35,6 +35,18 @@ interface DiagnosisResult {
   tumorSize: number;
 }
 
+interface DoctorProfile {
+  id: number;
+  name: string;
+  email: string;
+  phone: string | null;
+  specialization: string | null;
+  experience: string | null;
+  qualifications: string | null;
+  hospitalName: string;
+  hospitalCity: string;
+}
+
 export default function DoctorDashboard() {
   const { user } = useAuth();
   const { toast } = useToast();
@@ -49,6 +61,11 @@ export default function DoctorDashboard() {
   
   // Request response state
   const [requestResponses, setRequestResponses] = useState<Record<number, { slot: string; note: string }>>({});
+
+  // Fetch doctor's profile
+  const { data: doctorProfile, isLoading: profileLoading } = useQuery<DoctorProfile>({
+    queryKey: ["/api/doctor/profile"],
+  });
 
   // Fetch doctor's patients count
   const { data: patientsData } = useQuery({
@@ -149,8 +166,6 @@ export default function DoctorDashboard() {
         return "AFP Level (ng/mL)";
       case "lung":
         return "CEA Level (ng/mL)";
-      case "breast":
-        return "CA 15-3 Level (U/mL)";
       default:
         return "Biomarker Level";
     }
@@ -242,6 +257,76 @@ export default function DoctorDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {/* Doctor Profile Section */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <User className="h-5 w-5 text-medical-blue-600" />
+            My Profile
+          </CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Manage your professional credentials and hospital affiliations
+          </p>
+        </CardHeader>
+        <CardContent>
+          {profileLoading ? (
+            <div className="space-y-3">
+              <Skeleton className="h-6 w-48" />
+              <Skeleton className="h-4 w-64" />
+              <Skeleton className="h-4 w-56" />
+            </div>
+          ) : doctorProfile ? (
+            <div className="grid md:grid-cols-2 gap-6">
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-medical-blue-100 dark:bg-medical-blue-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <User className="h-5 w-5 text-medical-blue-600" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-lg">{doctorProfile.name}</p>
+                    <p className="text-sm text-muted-foreground">{doctorProfile.email}</p>
+                    {doctorProfile.phone && <p className="text-sm text-muted-foreground">{doctorProfile.phone}</p>}
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-medical-green-100 dark:bg-medical-green-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Building2 className="h-5 w-5 text-medical-green-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium">Hospital Affiliation</p>
+                    <p className="text-sm text-muted-foreground">{doctorProfile.hospitalName}</p>
+                    {doctorProfile.hospitalCity && <p className="text-xs text-muted-foreground">{doctorProfile.hospitalCity}</p>}
+                  </div>
+                </div>
+              </div>
+              <div className="space-y-4">
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Stethoscope className="h-5 w-5 text-purple-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium">Specialization</p>
+                    <p className="text-sm text-muted-foreground">{doctorProfile.specialization || "Not specified"}</p>
+                    <p className="text-xs text-muted-foreground">{doctorProfile.experience || "Experience not specified"}</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <div className="w-10 h-10 bg-medical-yellow-100 dark:bg-medical-yellow-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <GraduationCap className="h-5 w-5 text-medical-yellow-600" />
+                  </div>
+                  <div>
+                    <p className="font-medium">Qualifications</p>
+                    <p className="text-sm text-muted-foreground">{doctorProfile.qualifications || "Not specified"}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          ) : (
+            <p className="text-muted-foreground">Unable to load profile. Please try again.</p>
+          )}
+        </CardContent>
+      </Card>
 
       {/* Patient Requests */}
       <Card>
@@ -402,7 +487,6 @@ export default function DoctorDashboard() {
                   <SelectContent>
                     <SelectItem value="liver">Liver Cancer</SelectItem>
                     <SelectItem value="lung">Lung Cancer</SelectItem>
-                    <SelectItem value="breast">Breast Cancer</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -431,22 +515,6 @@ export default function DoctorDashboard() {
                   />
                 </div>
               </div>
-
-              {cancerType === "breast" && (
-                <div className="space-y-2">
-                  <Label>HER2 Status</Label>
-                  <Select value={biomarker2} onValueChange={setBiomarker2}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select HER2 status" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="positive">Positive</SelectItem>
-                      <SelectItem value="negative">Negative</SelectItem>
-                      <SelectItem value="unknown">Unknown</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
 
               {cancerType === "lung" && (
                 <div className="space-y-2">

@@ -1,0 +1,42 @@
+Act as a Senior Software Architect and Full-Stack Developer. I have an existing codebase for "DoctorPath AI" (a Pakistani Oncology Decision Support System).
+
+I need you to perform a **Final Polish and Gap Analysis**. Scan my code and strictly ensure the following 5 requirements are met. If they are missing, tell me exactly which files to modify.
+
+### 1. HYBRID DATABASE ARCHITECTURE (Strict Requirement)
+* **The Constraint:** The system must use TWO databases for different purposes:
+    * **MongoDB:** For the "Big/Schema-heavy" data (e.g., Patient Medical History, Case Logs, Unstructured Clinical Notes, Doctor/Patient Profiles).
+    * **PostgreSQL:** For the "AI Models & Training" data (e.g., Vector Embeddings, Model Usage Logs, Training Datasets, AI Performance Metrics).
+* **Your Task:** Check `server/db.ts` or `server/storage.ts`. Do I have connections for *both*? If I am only using one (e.g., just Postgres for everything), flag this as a **CRITICAL ARCHITECTURAL ERROR** and tell me how to split it.
+
+### 2. POSITIVE & PROFESSIONAL UX WRITING (No "Coming Soon")
+* **The Issue:** The "Medical History," "Appointments," and "Test Results" pages currently say "Coming soon...". This is unacceptable.
+* **The Fix:** Replace all placeholder text with welcoming, positive content:
+    * **For Patients:**
+        * *Medical History:* "Your health journey is important to us. No history recorded yet, but we are ready when you are."
+        * *Appointments:* "No upcoming consultations. Your dedicated doctors are available for booking whenever you need them."
+        * *Test Results:* "Your diagnostic reports will appear here securely as soon as our AI processes them. You are in good hands."
+    * **For Doctors:**
+        * *Dashboard:* "Ready to save lives? Select a case to begin your analysis."
+        * *Profile:* "Manage your professional credentials and hospital affiliations here."
+
+### 3. RESTRICT CANCER TYPES
+* **The Issue:** Dropdowns show too many options.
+* **The Fix:** Hard-code all "Cancer Type" dropdowns to show **ONLY** these two options:
+    1.  **Lung Cancer**
+    2.  **Liver Cancer**
+
+### 4. FIX DOCTOR PROFILE & SEED DATA
+* **Profile Bug:** The Doctor Profile tab is currently empty. Debug `DoctorDashboard.tsx` to ensure it fetches and displays the doctor's details (Name, Hospital, License ID).
+* **Seed Data (Pakistani Context):** Update `server/seed.ts` to use this EXACT dummy data:
+    * **Hospitals:** "Shaukat Khanum (Lahore)", "Aga Khan (Karachi)", "Shifa International (Islamabad)", "PIMS (Islamabad)", "JPMC (Karachi)", "CMH (Rawalpindi)", "Liaquat National (Karachi)", "Services Hospital (Lahore)", "Lady Reading (Peshawar)", "Indus Hospital (Karachi)".
+    * **Doctors (Login Credentials):**
+        * *Dr. Ali Raza:* `aliraza@gmail.com` / `aliraza786`
+        * *Dr. Ayesha Khan:* `ayeshakhan@gmail.com` / `ayeshakhan786`
+        * *Dr. Bilal Ahmed:* `bilalahmed@gmail.com` / `bilalahmed786`
+        * *(...ensure at least 10 doctors are seeded with this `firstname`+`lastname`+`786` password pattern).*
+
+### 5. HOSPITAL SELECTION FLOW
+* **The Logic:** A patient cannot just "find a doctor." They must first **Select a Hospital** -> then see **Doctors at that Hospital**.
+* **Your Task:** Check if the Frontend `BookAppointment` or `CreateCase` component follows this flow. If not, flag it.
+
+**START NOW:** Scan the file structure and report the gaps, especially regarding the MongoDB vs. PostgreSQL split.

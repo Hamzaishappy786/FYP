@@ -1,0 +1,59 @@
+Act as a Senior Software Architect and QA Lead. I have an existing codebase for a project called "DoctorPath AI," which is an Oncology Decision Support System (focusing on Liver/Lung cancer) built for the Pakistani healthcare context.
+
+Your goal is to perform a "Gap Analysis." I will provide you with the full System Design and Workflow specifications below. You need to scan my current file structure and code logic to identify WHAT IS MISSING or incomplete based on these specifications.
+
+### REFERENCE SPECIFICATIONS (The "Truth")
+
+**1. Core Architecture:**
+* **Type:** Layered Architecture (Frontend, Backend API, Database, AI Engine).
+* **Roles:** Patient, Doctor, Admin.
+* **Tech Stack:** Python Backend (FastAPI/Flask), Frontend (React/Templates), SQL Database, Vector Database (for RAG).
+
+**2. CRITICAL USER FLOW: "Hospital & Doctor Selection" (Check for this logic):**
+* **The Flow:** The patient cannot just "search for a doctor." They must follow this hierarchy:
+    1.  **Select Hospital:** User sees a list of Pakistani Hospitals (e.g., "Shaukat Khanum", "Aga Khan").
+    2.  **View Department:** User selects "Oncology" (or it's auto-selected).
+    3.  **Select Doctor:** User sees a list of doctors *linked* to that specific hospital.
+    4.  **Book/Connect:** Patient creates a case and assigns it to that selected doctor.
+* **Database Requirement:** You must check if my database models support this `Hospital -> Doctor -> Patient` relationship.
+
+**3. MANDATORY DUMMY DATA (Seed Data):**
+* The system cannot be empty. Check if I have a "seed script" or "initial data" file that populates the database with at least **10 Real Pakistani Hospitals** and **10 Doctors**.
+* **Use this specific data for the check:**
+    * *Hospitals:* 1. "Shaukat Khanum Memorial Cancer Hospital, Lahore"
+        2. "Aga Khan University Hospital, Karachi"
+        3. "Shifa International Hospital, Islamabad"
+        4. "Pakistan Institute of Medical Sciences (PIMS), Islamabad"
+        5. "Jinnah Postgraduate Medical Centre (JPMC), Karachi"
+        6. "Combined Military Hospital (CMH), Rawalpindi"
+        7. "Liaquat National Hospital, Karachi"
+        8. "Services Hospital, Lahore"
+        9. "Lady Reading Hospital, Peshawar"
+        10. "Indus Hospital, Karachi"
+    * *Doctors:* * Dr. Ali Raza (Liver Specialist) - Shaukat Khanum
+        * Dr. Ayesha Khan (Lung Specialist) - Aga Khan
+        * Dr. Bilal Ahmed (Oncologist) - Shifa International
+        * Dr. Zainab Malik - PIMS
+        * Dr. Usman Tariq - JPMC
+        * Dr. Fatima Yusuf - CMH
+        * Dr. Hamza Farooq - Liaquat National
+        * Dr. Sana Mir - Services Hospital
+        * Dr. Taimoor Hassan - Lady Reading
+        * Dr. Hira Javed - Indus Hospital
+    * *Patient:* "Muhammad Ahmed" (ahmed.muhammad@example.com).
+
+**4. The AI & Backend Engine (Gemini Powered):**
+* **RAG Pipeline:** OCR extraction on PDFs -> Chunking -> Vector Store.
+* **Knowledge Graph (Gemini API):** * The system must use **Google Gemini API** to process medical relations.
+    * *Check for:* Is the `google-generativeai` library installed? Is the API key set?
+* **Treatment Generation:** Function that sends (Patient Data + Graph Context) to Gemini to get a treatment plan.
+
+### YOUR TASK:
+1.  **Scan the Codebase:** Look at my file structure, API endpoints, and database models.
+2.  **Compare vs. Spec:** * **Logic Check:** Do I have the "Select Hospital" flow, or is it missing? 
+    * **Data Check:** Do I have the seed data for the 10 Pakistani hospitals and doctors?
+    * **AI Check:** Is the Gemini API connected for the Knowledge Graph?
+3.  **Report the Gaps:** Provide a bulleted list of missing items (e.g., "Missing 'Hospital' database model," "No seed script found for dummy data," "Gemini API client not initialized").
+4.  **Suggest Fixes:** Briefly tell me which files I need to create to fill these gaps.
+
+Start by analyzing the file structure now.

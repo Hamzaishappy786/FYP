@@ -1,0 +1,44 @@
+Act as a Senior Software Architect and QA Lead. I have an existing codebase for a project called "DoctorPath AI," which is an Oncology Decision Support System (focusing on Liver/Lung cancer).
+
+Your goal is to perform a "Gap Analysis." I will provide you with the full System Design and Workflow specifications below. You need to scan my current file structure and code logic to identify WHAT IS MISSING or incomplete based on these specifications.
+
+### REFERENCE SPECIFICATIONS (The "Truth")
+
+**1. Core Architecture:**
+* **Type:** Layered Architecture (Frontend, Backend API, Database, AI Engine).
+* **Roles:** Patient (Data Provider), Doctor (Analyzer/Decision Maker), Admin.
+* **Tech Stack Expected:** Python Backend (likely FastAPI/Flask), Frontend (React/HTML/Templates), SQL Database (Users/Cases), Vector Database (for RAG).
+
+**2. Mandatory Workflows & Logic (Check for these):**
+
+* **A. Authentication & Security:**
+    * Must have distinct flows for `Patient` and `Doctor`.
+    * Doctor must have privileged access to search/view other users' data.
+    * *Check for:* Role-based middleware or decorators.
+
+* **B. Patient Module:**
+    * **Case Creation:** Form to intake Demographics (Age, Gender) & Medical History.
+    * **Data Upload:** Capability to upload **Clinical Reports (PDF)** and **Imaging Data (DICOM/PNG)**.
+    * *Check for:* File handling endpoints, database models for `Case` and `MedicalFile`.
+
+* **C. The AI & Backend Engine (CRITICAL):**
+    * **RAG Pipeline (Retrieval-Augmented Generation):**
+        * **Extraction:** Logic to perform OCR on uploaded PDFs.
+        * **Preprocessing:** Cleaning text, chunking text, and saving embeddings to a Vector Store.
+    * **Knowledge Graph (Powered by Gemini):**
+        * **Requirement:** The system must use the **Google Gemini API** to assist in constructing and reasoning over the Knowledge Graph.
+        * **Logic:** The code should call Gemini to interpret medical relationships (e.g., "Extract entities from this report and map them to our graph schema").
+    * **Treatment Generation:** A function that takes (RAG Context + Knowledge Graph) -> Sends to **Gemini API** -> Returns a Treatment Plan.
+
+* **D. Doctor Module:**
+    * **Search:** Logic to query patients by Name or Case ID.
+    * **Visualization:** A frontend component to render a "Decision Graph" (Node-link diagram showing Evidence -> Rule -> Decision).
+    * **Reporting:** Logic to generate a downloadable PDF of the final treatment plan.
+
+### YOUR TASK:
+1.  **Scan the Codebase:** Look at my file structure, API endpoints, and database models.
+2.  **Compare vs. Spec:** Specific check for the **Gemini API integration**. Do I have the API keys configured? Is the client initialized? Is it actually being used for the Knowledge Graph logic?
+3.  **Report the Gaps:** Provide a bulleted list of "Missing Features" or "Incomplete Logic." Be specific (e.g., "You have the upload endpoint, but you are missing the Gemini API call to process the graph nodes.")
+4.  **Suggest Fixes:** Briefly tell me which files I need to create to fill these gaps.
+
+Start by analyzing the file structure now.
